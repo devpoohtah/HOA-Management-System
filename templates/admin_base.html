@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+<header class="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden">
+    <button id="admin-sidebar-toggle" class="p-2 rounded-lg hover:bg-gray-100" aria-label="Toggle menu">
+        <i data-lucide="menu" class="w-5 h-5 text-gray-700"></i>
+    </button>
+    <span class="text-sm font-semibold text-gray-900">Admin Panel</span>
+    <div class="w-9"></div>
+</header>
+{% endblock %}
+
+{% block sidebar %}
+<div id="admin-sidebar-backdrop" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
+<aside id="admin-sidebar"
+       class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-gray-300 flex flex-col transform -translate-x-full transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:flex lg:z-auto">
+    <div class="h-16 flex items-center gap-2 px-5 border-b border-gray-800 flex-shrink-0">
+        <div class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <i data-lucide="home" class="text-white w-4 h-4"></i>
+        </div>
+        <span class="text-sm font-semibold text-white leading-tight">HOA Admin</span>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path == '/dashboard' %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            Dashboard
+        </a>
+        <a href="/homeowners" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/homeowners') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            Homeowners
+        </a>
+        <a href="/dues" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/dues') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="receipt" class="w-4 h-4"></i>
+            Dues & Assessments
+        </a>
+        <a href="/payments" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/payments') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="wallet" class="w-4 h-4"></i>
+            Payments
+        </a>
+        <a href="/expenses" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/expenses') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="banknote" class="w-4 h-4"></i>
+            Expenses
+        </a>
+        <a href="/announcements" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/announcements') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="megaphone" class="w-4 h-4"></i>
+            Announcements
+        </a>
+        <a href="/complaints" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/complaints') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="message-square-warning" class="w-4 h-4"></i>
+            Complaints
+        </a>
+        <a href="/projects" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/projects') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="hard-hat" class="w-4 h-4"></i>
+            Projects
+        </a>
+        <a href="/documents" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/documents') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            Documents
+        </a>
+        <a href="/meetings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/meetings') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="calendar-days" class="w-4 h-4"></i>
+            Meetings
+        </a>
+        <a href="/requests" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {% if request.url.path.startswith('/requests') %}bg-gray-800 text-white{% else %}hover:bg-gray-800 hover:text-white{% endif %}">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+            Requests
+        </a>
+    </nav>
+
+    <div class="border-t border-gray-800 p-3 flex-shrink-0">
+        <a href="/login/logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Log Out
+        </a>
+    </div>
+</aside>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const sidebar = document.getElementById("admin-sidebar");
+        const backdrop = document.getElementById("admin-sidebar-backdrop");
+        const toggleBtn = document.getElementById("admin-sidebar-toggle");
+
+        function openSidebar() {
+            sidebar.classList.remove("-translate-x-full");
+            backdrop.classList.remove("hidden");
+        }
+        function closeSidebar() {
+            sidebar.classList.add("-translate-x-full");
+            backdrop.classList.add("hidden");
+        }
+
+        if (toggleBtn) toggleBtn.addEventListener("click", openSidebar);
+        if (backdrop) backdrop.addEventListener("click", closeSidebar);
+    })();
+</script>
+{% endblock %}

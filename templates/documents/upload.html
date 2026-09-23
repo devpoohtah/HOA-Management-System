@@ -1,0 +1,51 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Add Document - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-1">Add Document</h1>
+    <p class="text-sm text-gray-500 mb-6">Publish a reference to an HOA document.</p>
+
+    {% if error %}
+    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/documents/upload" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="title" name="title" required
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select id="category" name="category" required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="Bylaws">Bylaws</option>
+                <option value="Rules and Regulations">Rules and Regulations</option>
+                <option value="Meeting Minutes">Meeting Minutes</option>
+                <option value="Financial Reports">Financial Reports</option>
+                <option value="Annual Reports">Annual Reports</option>
+                <option value="Resolutions">Resolutions</option>
+                <option value="Notices">Notices</option>
+                <option value="Project Documents">Project Documents</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="file_url" class="block text-sm font-medium text-gray-700 mb-1">
+                Document Link (optional)
+            </label>
+            <input type="text" id="file_url" name="file_url" placeholder="Leave blank if none available online"
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+
+        <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            Add Document
+        </button>
+    </form>
+</div>
+{% endblock %}

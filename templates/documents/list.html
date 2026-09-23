@@ -1,0 +1,56 @@
+{% extends base_template %}
+
+{% block title %}Documents - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Documents</h1>
+            <p class="text-sm text-gray-500 mt-1">HOA bylaws, minutes, reports, and notices</p>
+        </div>
+        {% if is_admin_view %}
+        <a href="/documents/upload"
+           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            <i data-lucide="upload" class="w-4 h-4"></i>
+            Add Document
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200 text-left text-gray-600">
+                <tr>
+                    <th class="px-6 py-3 font-medium">Title</th>
+                    <th class="px-6 py-3 font-medium">Category</th>
+                    <th class="px-6 py-3 font-medium">Date Added</th>
+                    <th class="px-6 py-3 font-medium">Link</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for d in documents %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-3 text-gray-900 font-medium">{{ d.title }}</td>
+                    <td class="px-6 py-3 text-gray-700">{{ d.category }}</td>
+                    <td class="px-6 py-3 text-gray-700">{{ d.created_at or "-" }}</td>
+                    <td class="px-6 py-3">
+                        {% if d.file_url %}
+                        <a href="{{ d.file_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            View
+                        </a>
+                        {% else %}
+                        <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">No documents on file yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

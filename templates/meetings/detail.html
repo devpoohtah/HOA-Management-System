@@ -1,0 +1,80 @@
+{% extends base_template %}
+{% block title %}{{ meeting.title }} - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <a href="/meetings" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Meetings
+    </a>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+        <div class="flex items-center justify-between mb-3">
+            {% if meeting.status == "Completed" %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Completed</span>
+            {% else %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Upcoming</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">
+                {{ meeting.meeting_date }}{% if meeting.meeting_time %} · {{ meeting.meeting_time }}{% endif %}
+            </span>
+        </div>
+
+        <h1 class="text-xl font-semibold text-gray-900 mb-1">{{ meeting.title }}</h1>
+        <p class="text-sm text-gray-500 mb-4">{{ meeting.location }}</p>
+
+        <div class="mb-4">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Agenda</h3>
+            <p class="text-sm text-gray-700 whitespace-pre-line">{{ meeting.agenda }}</p>
+        </div>
+
+        {% if meeting.minutes %}
+        <div class="mb-4 pt-4 border-t border-gray-100">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Minutes</h3>
+            <p class="text-sm text-gray-700 whitespace-pre-line">{{ meeting.minutes }}</p>
+        </div>
+        {% endif %}
+
+        {% if meeting.decisions %}
+        <div class="mb-4">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Decisions / Resolutions</h3>
+            <p class="text-sm text-gray-700 whitespace-pre-line">{{ meeting.decisions }}</p>
+        </div>
+        {% endif %}
+
+        {% if meeting.attendees %}
+        <div>
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Attendees</h3>
+            <p class="text-sm text-gray-700">{{ meeting.attendees }}</p>
+        </div>
+        {% endif %}
+
+        {% if is_admin_view %}
+        <form method="post" action="/meetings/{{ meeting.id }}/minutes" class="mt-6 pt-6 border-t border-gray-100 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-900">
+                {% if meeting.minutes %}Update Minutes{% else %}Record Minutes{% endif %}
+            </h3>
+            <div>
+                <label for="minutes" class="block text-sm font-medium text-gray-700 mb-1">Minutes</label>
+                <textarea id="minutes" name="minutes" rows="4" required
+                          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ meeting.minutes or "" }}</textarea>
+            </div>
+            <div>
+                <label for="decisions" class="block text-sm font-medium text-gray-700 mb-1">Decisions / Resolutions</label>
+                <textarea id="decisions" name="decisions" rows="3"
+                          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ meeting.decisions or "" }}</textarea>
+            </div>
+            <div>
+                <label for="attendees" class="block text-sm font-medium text-gray-700 mb-1">Attendees</label>
+                <input type="text" id="attendees" name="attendees" value="{{ meeting.attendees or '' }}"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+                Save
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

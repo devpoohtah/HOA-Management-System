@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-6">My Profile</h1>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center">
+                <i data-lucide="user" class="text-blue-600 w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-lg font-semibold text-gray-900">{{ homeowner.full_name }}</p>
+                <p class="text-sm text-gray-500">
+                    {% if homeowner.block or homeowner.lot %}
+                        Block {{ homeowner.block or "-" }}, Lot {{ homeowner.lot or "-" }}
+                    {% else %}
+                        No block/lot on file
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+                <dt class="text-gray-500">Email</dt>
+                <dd class="text-gray-900 mt-0.5">{{ homeowner.email }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Phone</dt>
+                <dd class="text-gray-900 mt-0.5">{{ homeowner.phone or "-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Status</dt>
+                <dd class="mt-0.5">
+                    {% if homeowner.is_active %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        Active
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        Inactive
+                    </span>
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}

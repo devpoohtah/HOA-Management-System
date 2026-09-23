@@ -1,0 +1,47 @@
+{% extends "admin_base.html" %} 
+
+{% block title %}New Announcement - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-1">New Announcement</h1>
+    <p class="text-sm text-gray-500 mb-6">Publish a notice to all homeowners.</p>
+
+    {% if error %}
+    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/announcements/new" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="title" name="title" required
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select id="category" name="category"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="meeting">Meeting</option>
+                <option value="water_interruption">Water Interruption</option>
+                <option value="road_maintenance">Road Maintenance</option>
+                <option value="garbage_collection">Garbage Collection</option>
+                <option value="security">Security Notice</option>
+                <option value="dues_reminder">Dues Reminder</option>
+                <option value="general" selected>Community Notice</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <textarea id="content" name="content" rows="6" required
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            Publish
+        </button>
+    </form>
+</div>
+{% endblock %}

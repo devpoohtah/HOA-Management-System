@@ -1,0 +1,90 @@
+# app/routers/payments.py
+
+from typing import Optional
+
+from fastapi import APIRouter, Request, Depends, Form, HTTPException
+from fastapi.responses import RedirectResponse
+
+from app.core.templates import templates
+from app.core.dependencies import require_authenticated, require_role
+from app.core.security import get_access_token_from_request
+from app.services.payment_service import (
+    list_all_payments_admin,
+    list_own_payments,
+    record_payment_admin,
+)
+from app.services.homeowner_service import list_all_homeowners_admin, get_own_homeowner_profile
+from app.services.dues_service import list_all_assessments_admin
+from app.schemas.payment import PaymentCreate
+
+router = APIRouter(prefix="/payments", tags=["payments"])
+
+
+@router.get("")
+def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
+    payments = list_all_payments_admin()
+    return templates.TemplateResponse(
+        request=request,
+        name="payments/list.html",
+        context={"payments": payments},
+    )
+
+
+@router.get("/record")
+def record_payment_form(request: Request, user=Depends(require_role("admin"))):
+    """Form for the secretary/admin to manually record a cash payment."""
+    homeowners = list_all_homeowners_admin()
+    assessments = list_all_assessments_admin()
+    return templates.TemplateResponse(
+        request=request,
+        name="payments/record.html",
+        context={"homeowners": homeowners, "assessments": assessments, "error": None},
+    )
+
+
+@router.post("/record")
+def record_payment_submit(
+    request: Request,
+    homeowner_id: str = Form(...),
+    assessment_id: Optional[str] = Form(None),
+    amount: float = Form(...),
+    payment_date: str = Form(...),
+    payment_method: str = Form("cash"),
+    reference_number: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
+    user=Depends(require_role("admin")),
+):
+    payment_data = PaymentCreate(
+        homeowner_id=homeowner_id,
+        assessment_id=assessment_id or None,
+        amount=amount,
+        payment_date=payment_date,
+        payment_method=payment_method,
+        reference_number=reference_number,
+        notes=notes,
+    ).model_dump()
+
+    recorded_by = getattr(user, "id", "unknown")
+    record_payment_admin(payment_data, recorded_by=recorded_by)
+
+    return RedirectResponse(url="/payments", status_code=303)
+
+
+@router.get("/me")
+def my_payment_history(request: Request, user=Depends(require_authenticated)):
+    access_token = get_access_token_from_request(request)
+    homeowner = get_own_homeowner_profile(access_token=access_token, user_id=user.id)
+
+    if homeowner is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No homeowner record is linked to your account yet. "
+                   "Please contact the HOA secretary.",
+        )
+
+    payments = list_own_payments(access_token=access_token, homeowner_id=homeowner.id)
+    return templates.TemplateResponse(
+        request=request,
+        name="payments/history.html",
+        context={"homeowner": homeowner, "payments": payments},
+    )

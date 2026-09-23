@@ -1,0 +1,74 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Admin Dashboard - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-1">Admin Dashboard</h1>
+    <p class="text-sm text-gray-500 mb-6">Iloilo River Plains Subdivision Village 3</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="users" class="w-4 h-4"></i>
+                Homeowners
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">{{ total_homeowners }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+                Total Collected
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_collected) }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                Total Outstanding
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_outstanding) }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+                Total Expenses
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_expenses) }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                Expected Collections
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(summary.expected_collections) }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="scale" class="w-4 h-4"></i>
+                Ending Balance
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(summary.ending_balance) }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-4">Expenses by Category</h2>
+        {% if summary.expense_by_category %}
+        <div class="space-y-2">
+            {% for category, amount in summary.expense_by_category.items() %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-700 capitalize">{{ category }}</span>
+                <span class="text-gray-900 font-medium">₱{{ "%.2f"|format(amount) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-400">No expenses recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

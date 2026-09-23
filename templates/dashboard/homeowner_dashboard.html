@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-1">My Dashboard</h1>
+    <p class="text-sm text-gray-500 mb-6">Iloilo River Plains Subdivision Village 3</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+                My Outstanding Balance
+            </div>
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(own_outstanding) }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                Last Payment
+            </div>
+            {% if last_payment %}
+            <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(last_payment.amount) }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ last_payment.payment_date }}</p>
+            {% else %}
+            <p class="text-2xl font-semibold text-gray-900">-</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-8">
+        <h2 class="text-sm font-semibold text-gray-900 mb-4">Community Financial Summary</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Total Collected</p>
+                <p class="text-base font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_collected) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Total Outstanding</p>
+                <p class="text-base font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_outstanding) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Total Expenses</p>
+                <p class="text-base font-semibold text-gray-900">₱{{ "%.2f"|format(summary.total_expenses) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Expected Collections</p>
+                <p class="text-base font-semibold text-gray-900">₱{{ "%.2f"|format(summary.expected_collections) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Ending Balance</p>
+                <p class="text-base font-semibold text-gray-900">₱{{ "%.2f"|format(summary.ending_balance) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <p class="text-sm text-gray-500">
+            Announcements, your requests, and complaint status appear on their own pages.
+        </p>
+    </div>
+</div>
+{% endblock %}

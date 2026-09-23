@@ -1,0 +1,45 @@
+{% extends base_template %}
+
+{% block title %}Projects & Maintenance - HOA Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Projects & Maintenance</h1>
+            <p class="text-sm text-gray-500 mt-1">Budget vs. actual spending, for transparency</p>
+        </div>
+        <a href="/projects/new"
+           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            New Project
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% for p in projects %}
+        <a href="/projects/{{ p.id }}"
+           class="block bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hover:border-blue-300 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+                {% if p.status == "Completed" %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">{{ p.status }}</span>
+                {% elif p.status == "In Progress" %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ p.status }}</span>
+                {% elif p.status == "On Hold" %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{{ p.status }}</span>
+                {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{{ p.status }}</span>
+                {% endif %}
+            </div>
+            <h2 class="text-base font-semibold text-gray-900">{{ p.name }}</h2>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ p.description }}</p>
+            <p class="text-sm text-gray-700 mt-3 font-medium">Budget: ₱{{ "%.2f"|format(p.budget) }}</p>
+        </a>
+        {% else %}
+        <div class="col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center text-gray-400">
+            No projects on record yet.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
