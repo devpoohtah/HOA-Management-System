@@ -4,6 +4,10 @@
 
 {% block content %}
 <div class="max-w-xl mx-auto">
+    <a href="/expenses" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Expenses
+    </a>
     <h1 class="text-2xl font-semibold text-gray-900 mb-1">Record Expense</h1>
     <p class="text-sm text-gray-500 mb-6">Log HOA money going out.</p>
 
@@ -49,6 +53,19 @@
             </label>
             <input type="text" id="receipt_url" name="receipt_url" placeholder="Leave blank if none on file"
                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+
+        <div>
+            <label for="project_id" class="block text-sm font-medium text-gray-700 mb-1">
+                Project (optional)
+            </label>
+            <select id="project_id" name="project_id"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Not linked to a project</option>
+                {% for p in projects %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <button type="submit"

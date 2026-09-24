@@ -38,6 +38,9 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{{ r.status }}</span>
                 {% endif %}
             </div>
+            {% if is_admin_view %}
+            <p class="text-xs text-gray-500 mb-1">{{ homeowners_by_id.get(r.homeowner_id, r.homeowner_id) }}</p>
+            {% endif %}
             <p class="text-sm text-gray-700 line-clamp-2">{{ r.description }}</p>
             <p class="text-xs text-gray-400 mt-2">{{ r.created_at or "" }}</p>
         </a>

@@ -12,7 +12,7 @@ from app.services.request_service import (
     create_request,
     update_request_status_admin,
 )
-from app.services.homeowner_service import get_own_homeowner_profile
+from app.services.homeowner_service import get_own_homeowner_profile, list_all_homeowners_admin
 from app.schemas.request import RequestCreate, RequestStatusUpdate
 
 router = APIRouter(prefix="/requests", tags=["requests"])
@@ -24,12 +24,14 @@ def requests_list(request: Request, user=Depends(require_authenticated)):
 
     if role == "admin":
         req_list = list_all_requests_admin()
+        homeowners_by_id = {h.id: h.full_name for h in list_all_homeowners_admin()}
         return templates.TemplateResponse(
             request=request,
             name="requests/list.html",
             context={
                 "requests": req_list,
                 "is_admin_view": True,
+                "homeowners_by_id": homeowners_by_id,
                 "base_template": "admin_base.html",
             },
         )
@@ -105,12 +107,18 @@ def request_detail(request: Request, request_id: str, user=Depends(require_authe
     if req is None:
         raise HTTPException(status_code=404, detail="Request not found.")
 
+    requester_name = None
+    if is_admin_view:
+        homeowners_by_id = {h.id: h.full_name for h in list_all_homeowners_admin()}
+        requester_name = homeowners_by_id.get(req.homeowner_id, req.homeowner_id)
+
     return templates.TemplateResponse(
         request=request,
         name="requests/detail.html",
         context={
             "req": req,
             "is_admin_view": is_admin_view,
+            "requester_name": requester_name,
             "base_template": "admin_base.html" if is_admin_view else "base.html",
         },
     )

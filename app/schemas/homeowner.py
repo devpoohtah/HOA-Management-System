@@ -1,7 +1,7 @@
 # app/schemas/homeowner.py
 
 from typing import Optional, Literal
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
 
 class HomeownerBase(BaseModel):
@@ -21,6 +21,17 @@ class HomeownerCreate(HomeownerBase):
     initial provisioning.
     """
     user_id: str
+
+
+class HomeownerAccountCreate(HomeownerBase):
+    """
+    Used by an admin/secretary to create a brand-new homeowner
+    ACCOUNT from scratch — both the Supabase Auth login and the
+    homeowners record, in one step. Unlike HomeownerCreate, there is
+    no existing user_id yet; the Auth user is created as part of
+    this same flow (see homeowner_service.create_homeowner_account_admin).
+    """
+    password: str = Field(min_length=8)
 
 
 class HomeownerUpdate(BaseModel):
@@ -58,4 +69,4 @@ class HomeownerOut(HomeownerBase):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True) 

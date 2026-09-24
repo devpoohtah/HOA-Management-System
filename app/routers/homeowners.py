@@ -11,9 +11,12 @@ from app.services.homeowner_service import (
     get_own_homeowner_profile,
     get_homeowner_by_id_admin,
     update_homeowner_role_admin,
+    create_homeowner_account_admin,
     RoleChangeNotAllowedError,
+    DuplicateHomeownerError,
+    AccountCreationError,
 )
-from app.schemas.homeowner import HomeownerRoleUpdate
+from app.schemas.homeowner import HomeownerRoleUpdate, HomeownerAccountCreate
 
 router = APIRouter(prefix="/homeowners", tags=["homeowners"])
 
@@ -33,6 +36,52 @@ def homeowners_list(request: Request, user=Depends(require_role("admin"))):
         context={"homeowners": homeowners},
     )
 
+@router.get("/new")
+def new_homeowner_form(request: Request, user=Depends(require_role("admin"))):
+    return templates.TemplateResponse(
+        "homeowners/new.html",
+        {"request": request, "error": None, "form": {}},
+    )
+
+
+@router.post("/new")
+def create_homeowner_submit(
+    request: Request,
+    user=Depends(require_role("admin")),
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(None),
+    block: str = Form(None),
+    lot: str = Form(None),
+    password: str = Form(...),
+):
+    form_values = {
+        "first_name": first_name, "last_name": last_name, "email": email,
+        "phone": phone, "block": block, "lot": lot,
+    }
+    try:
+        payload = HomeownerAccountCreate(**form_values, password=password)
+    except Exception as e:
+        return templates.TemplateResponse(
+            "homeowners/new.html",
+            {"request": request, "error": str(e), "form": form_values},
+        )
+
+    try:
+        create_homeowner_account_admin(payload.model_dump(exclude={"password"}), payload.password)
+    except DuplicateHomeownerError as e:
+        return templates.TemplateResponse(
+            "homeowners/new.html",
+            {"request": request, "error": str(e), "form": form_values},
+        )
+    except AccountCreationError as e:
+        return templates.TemplateResponse(
+            "homeowners/new.html",
+            {"request": request, "error": str(e), "form": form_values},
+        )
+
+    return RedirectResponse(url="/homeowners", status_code=303)
 
 @router.get("/me")
 def my_profile(request: Request, user=Depends(require_authenticated)):

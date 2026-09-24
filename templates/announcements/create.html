@@ -4,13 +4,18 @@
 
 {% block content %}
 <div class="max-w-xl mx-auto">
+
+    <a href="/announcements" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Announcements
+    </a>
     <h1 class="text-2xl font-semibold text-gray-900 mb-1">New Announcement</h1>
     <p class="text-sm text-gray-500 mb-6">Publish a notice to all homeowners.</p>
 
     {% if error %}
     <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{{ error }}</div>
     {% endif %}
-
+    
     <form method="post" action="/announcements/new" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
         <div>
             <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>

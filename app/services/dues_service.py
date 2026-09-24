@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from app.core.supabase_client import get_supabase_admin_client, get_user_scoped_client
 from app.models.assessment import Assessment
+from app.services.homeowner_service import list_all_homeowners_admin
 
 TABLE_NAME = "assessments"  # NOTE: assumed table name, pending schema confirmation
 
@@ -76,6 +77,20 @@ def create_assessment_admin(data: dict) -> Assessment:
     client = get_supabase_admin_client()
     response = client.table(TABLE_NAME).insert(data).execute()
     return _row_to_assessment(response.data[0])
+
+
+def bulk_generate_assessments_admin(base_data: dict) -> List[Assessment]:
+    """
+    Creates the SAME assessment (description, amount, type, period,
+    due date) for every currently active homeowner in one action —
+    e.g. "the ₱50 October 2026 due" for everyone at once, instead of
+    one-by-one. Inactive homeowners are skipped.
+    """
+    homeowners = [h for h in list_all_homeowners_admin() if h.is_active]
+    created = []
+    for h in homeowners:
+        created.append(create_assessment_admin({**base_data, "homeowner_id": h.id}))
+    return created
 
 
 def get_assessment_by_id_admin(assessment_id: str) -> Optional[Assessment]:

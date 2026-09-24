@@ -1,6 +1,6 @@
 # app/routers/payments.py
 
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from fastapi.responses import RedirectResponse
@@ -23,10 +23,18 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 @router.get("")
 def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
     payments = list_all_payments_admin()
+    homeowners = list_all_homeowners_admin()
+    homeowner_names = {h.id: h.full_name for h in homeowners}
+    # recorded_by stores the Supabase Auth user id of whoever recorded the payment
+    recorder_names = {h.user_id: h.full_name for h in homeowners}
     return templates.TemplateResponse(
         request=request,
         name="payments/list.html",
-        context={"payments": payments},
+        context={
+            "payments": payments,
+            "homeowner_names": homeowner_names,
+            "recorder_names": recorder_names,
+        },
     )
 
 
@@ -34,7 +42,7 @@ def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
 def record_payment_form(request: Request, user=Depends(require_role("admin"))):
     """Form for the secretary/admin to manually record a cash payment."""
     homeowners = list_all_homeowners_admin()
-    assessments = list_all_assessments_admin()
+    assessments = [a for a in list_all_assessments_admin() if a.status == "UNPAID"]
     return templates.TemplateResponse(
         request=request,
         name="payments/record.html",
@@ -46,7 +54,7 @@ def record_payment_form(request: Request, user=Depends(require_role("admin"))):
 def record_payment_submit(
     request: Request,
     homeowner_id: str = Form(...),
-    assessment_id: Optional[str] = Form(None),
+    assessment_ids: List[str] = Form(default=[]),
     amount: float = Form(...),
     payment_date: str = Form(...),
     payment_method: str = Form("cash"),
@@ -54,18 +62,36 @@ def record_payment_submit(
     notes: Optional[str] = Form(None),
     user=Depends(require_role("admin")),
 ):
-    payment_data = PaymentCreate(
-        homeowner_id=homeowner_id,
-        assessment_id=assessment_id or None,
-        amount=amount,
-        payment_date=payment_date,
-        payment_method=payment_method,
-        reference_number=reference_number,
-        notes=notes,
-    ).model_dump()
-
     recorded_by = getattr(user, "id", "unknown")
-    record_payment_admin(payment_data, recorded_by=recorded_by)
+    assessment_ids = [a for a in assessment_ids if a]
+
+    if assessment_ids:
+        assessments = {a.id: a for a in list_all_assessments_admin() if a.id in assessment_ids}
+        for aid in assessment_ids:
+            assessment = assessments.get(aid)
+            if assessment is None:
+                continue
+            payment_data = PaymentCreate(
+                homeowner_id=homeowner_id,
+                assessment_id=aid,
+                amount=assessment.amount,
+                payment_date=payment_date,
+                payment_method=payment_method,
+                reference_number=reference_number,
+                notes=notes,
+            ).model_dump()
+            record_payment_admin(payment_data, recorded_by=recorded_by)
+    else:
+        payment_data = PaymentCreate(
+            homeowner_id=homeowner_id,
+            assessment_id=None,
+            amount=amount,
+            payment_date=payment_date,
+            payment_method=payment_method,
+            reference_number=reference_number,
+            notes=notes,
+        ).model_dump()
+        record_payment_admin(payment_data, recorded_by=recorded_by)
 
     return RedirectResponse(url="/payments", status_code=303)
 

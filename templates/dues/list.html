@@ -7,11 +7,18 @@
     <h1 class="text-2xl font-semibold text-gray-900 mb-1">Dues & Assessments</h1>
     <div class="flex items-center justify-between mb-4">
         <p class="text-sm text-gray-500">All assessments across homeowners</p>
-        <a href="/dues/new"
-           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            New Assessment
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="/dues/generate"
+               class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+                <i data-lucide="users" class="w-4 h-4"></i>
+                Generate for All
+            </a>
+            <a href="/dues/new"
+               class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                New Assessment
+            </a>
+        </div>
     </div>
 
     <div class="flex gap-2 mb-6">
@@ -29,17 +36,11 @@
         </a>
     </div>
 
-    <!--
-        NOTE: shows homeowner_id, not a name — this view has no
-        homeowner-name lookup joined in yet. Fine for now since the
-        admin can cross-reference against the Homeowners list, but
-        worth adding a name join before this ships for real use.
-    -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200 text-left text-gray-600">
                 <tr>
-                    <th class="px-6 py-3 font-medium">Homeowner ID</th>
+                    <th class="px-6 py-3 font-medium">Homeowner</th>
                     <th class="px-6 py-3 font-medium">Type</th>
                     <th class="px-6 py-3 font-medium">Description</th>
                     <th class="px-6 py-3 font-medium">Period</th>
@@ -51,7 +52,7 @@
             <tbody class="divide-y divide-gray-100">
                 {% for a in assessments %}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-3 text-gray-700">{{ a.homeowner_id }}</td>
+                    <td class="px-6 py-3 text-gray-700">{{ homeowner_names.get(a.homeowner_id, "Unknown homeowner") }}</td>
                     <td class="px-6 py-3 text-gray-700 capitalize">{{ a.assessment_type }}</td>
                     <td class="px-6 py-3 text-gray-900">{{ a.description }}</td>
                     <td class="px-6 py-3 text-gray-700">{{ a.period_label or "-" }}</td>

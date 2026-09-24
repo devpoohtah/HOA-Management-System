@@ -12,9 +12,10 @@ from app.services.dues_service import (
     list_assessments_by_status_admin,
     list_own_assessments,
     create_assessment_admin,
+    bulk_generate_assessments_admin,
 )
 from app.services.homeowner_service import get_own_homeowner_profile, list_all_homeowners_admin
-from app.schemas.assessment import AssessmentCreate
+from app.schemas.assessment import AssessmentCreate, AssessmentBase
 
 router = APIRouter(prefix="/dues", tags=["dues"])
 
@@ -35,12 +36,17 @@ def dues_list_admin(
     else:
         assessments = list_all_assessments_admin()
 
+    homeowner_names = {h.id: h.full_name for h in list_all_homeowners_admin()}
+
     return templates.TemplateResponse(
         request=request,
         name="dues/list.html",
-        context={"assessments": assessments, "status_filter": status_filter},
+        context={
+            "assessments": assessments,
+            "status_filter": status_filter,
+            "homeowner_names": homeowner_names,
+        },
     )
-
 
 @router.get("/new")
 def new_assessment_form(request: Request, user=Depends(require_role("admin"))):
@@ -78,6 +84,38 @@ def new_assessment_submit(
 
     create_assessment_admin(data)
     return RedirectResponse(url="/dues", status_code=303)
+
+
+@router.get("/generate")
+def generate_assessments_form(request: Request, user=Depends(require_role("admin"))):
+    """Admin-only: form to generate one assessment for every active homeowner at once."""
+    return templates.TemplateResponse(
+        request=request,
+        name="dues/generate.html",
+        context={"error": None},
+    )
+
+
+@router.post("/generate")
+def generate_assessments_submit(
+    request: Request,
+    assessment_type: str = Form("regular"),
+    description: str = Form(...),
+    amount: float = Form(...),
+    period_label: Optional[str] = Form(None),
+    due_date: Optional[str] = Form(None),
+    user=Depends(require_role("admin")),
+):
+    base_data = AssessmentBase(
+        assessment_type=assessment_type,
+        description=description,
+        amount=amount,
+        period_label=period_label,
+        due_date=due_date,
+    ).model_dump()
+
+    created = bulk_generate_assessments_admin(base_data)
+    return RedirectResponse(url=f"/dues?generated={len(created)}", status_code=303)
 
 
 @router.get("/me")

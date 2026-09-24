@@ -10,6 +10,12 @@ class AnnouncementCreate(BaseModel):
     category: str = "general"
 
 
+class AnnouncementUpdate(BaseModel):
+    title: str
+    content: str
+    category: str = "general"
+
+
 class AnnouncementOut(BaseModel):
     id: str
     title: str

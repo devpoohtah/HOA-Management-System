@@ -4,14 +4,19 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-semibold text-gray-900">Homeowners</h1>
-            <p class="text-sm text-gray-500 mt-1">
-                Iloilo River Plains Subdivision Village 3
-            </p>
-        </div>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-gray-900">Homeowners</h1>
+        <p class="text-sm text-gray-500 mt-1">
+            Iloilo River Plains Subdivision Village 3
+        </p>
     </div>
+    <a href="/homeowners/new"
+       class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        New Homeowner
+    </a>
+</div>
 
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <table class="w-full text-sm">
@@ -61,7 +66,7 @@
                     </td>
                     <td class="px-6 py-3">
                         <a href="/homeowners/{{ homeowner.id }}/role" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                            Manage Role
+                            Manage
                         </a>
                     </td>
                 </tr>

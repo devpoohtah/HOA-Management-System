@@ -7,8 +7,10 @@ from app.services.announcement_service import (
     list_all_announcements,
     get_announcement_by_id,
     create_announcement_admin,
+    update_announcement_admin,
+    delete_announcement_admin,
 )
-from app.schemas.announcement import AnnouncementCreate
+from app.schemas.announcement import AnnouncementCreate, AnnouncementUpdate
 
 router = APIRouter(prefix="/announcements", tags=["announcements"])
 
@@ -60,12 +62,47 @@ def announcement_detail(request: Request, announcement_id: str, user=Depends(req
         raise HTTPException(status_code=404, detail="Announcement not found.")
 
     role = get_user_role(user)
+    is_admin = role == "admin"
 
     return templates.TemplateResponse(
         request=request,
         name="announcements/detail.html",
         context={
             "announcement": announcement,
-            "base_template": "admin_base.html" if role == "admin" else "base.html",
+            "is_admin": is_admin,
+            "base_template": "admin_base.html" if is_admin else "base.html",
         },
     )
+
+
+@router.get("/{announcement_id}/edit")
+def edit_announcement_form(request: Request, announcement_id: str, user=Depends(require_role("admin"))):
+    announcement = get_announcement_by_id(announcement_id)
+    if announcement is None:
+        raise HTTPException(status_code=404, detail="Announcement not found.")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="announcements/edit.html",
+        context={"announcement": announcement, "error": None},
+    )
+
+
+@router.post("/{announcement_id}/edit")
+def edit_announcement_submit(
+    request: Request,
+    announcement_id: str,
+    title: str = Form(...),
+    content: str = Form(...),
+    category: str = Form("general"),
+    user=Depends(require_role("admin")),
+):
+    data = AnnouncementUpdate(title=title, content=content, category=category).model_dump()
+    update_announcement_admin(announcement_id, data)
+    return RedirectResponse(url=f"/announcements/{announcement_id}", status_code=303)
+
+
+@router.post("/{announcement_id}/delete")
+def delete_announcement_submit(announcement_id: str, user=Depends(require_role("admin"))):
+    delete_announcement_admin(announcement_id)
+    return RedirectResponse(url="/announcements", status_code=303)

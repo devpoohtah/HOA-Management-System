@@ -44,3 +44,22 @@ def create_announcement_admin(data: dict, published_by: str) -> Announcement:
     client = get_supabase_admin_client()
     response = client.table(TABLE_NAME).insert(announcement_data).execute()
     return _row_to_announcement(response.data[0])
+
+
+def update_announcement_admin(announcement_id: str, data: dict) -> Announcement:
+    """Admin-only: edit an existing announcement's title/content/category."""
+    client = get_supabase_admin_client()
+    response = (
+        client.table(TABLE_NAME)
+        .update(data)
+        .eq("id", announcement_id)
+        .execute()
+    )
+    return _row_to_announcement(response.data[0])
+
+
+def delete_announcement_admin(announcement_id: str) -> None:
+    """Admin-only: permanently remove an announcement."""
+    client = get_supabase_admin_client()
+    client.table(TABLE_NAME).delete().eq("id", announcement_id).execute()
+    

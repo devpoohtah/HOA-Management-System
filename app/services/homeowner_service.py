@@ -20,8 +20,33 @@ class RoleChangeNotAllowedError(Exception):
     pass
 
 
+class DuplicateHomeownerError(Exception):
+    """Raised when a new account is attempted with an email already on file."""
+    pass
+
+
+class AccountCreationError(Exception):
+    """Raised when Supabase Auth account creation itself fails (e.g. bad request)."""
+    pass
+
+
 def _row_to_homeowner(row: dict) -> Homeowner:
     return Homeowner(**row)
+
+
+def get_homeowner_by_email_admin(email: str) -> Optional[Homeowner]:
+    """Admin-only: used to check for a duplicate before creating a new account."""
+    client = get_supabase_admin_client()
+    response = (
+        client.table(TABLE_NAME)
+        .select("*")
+        .eq("email", email)
+        .limit(1)
+        .execute()
+    )
+    if not response.data:
+        return None
+    return _row_to_homeowner(response.data[0])
 
 
 def list_all_homeowners_admin() -> List[Homeowner]:
@@ -100,6 +125,54 @@ def create_homeowner_admin(data: dict) -> Homeowner:
     client = get_supabase_admin_client()
     response = client.table(TABLE_NAME).insert(data).execute()
     return _row_to_homeowner(response.data[0])
+
+
+def create_homeowner_account_admin(data: dict, password: str) -> Homeowner:
+    """
+    Admin-only: create a brand-new homeowner ACCOUNT from scratch —
+    both the Supabase Auth login (email + password) and the linked
+    homeowners record, in one step.
+
+    Order of operations matters here:
+      1. Check for a duplicate email in OUR table first, before
+         touching Supabase Auth at all — cheapest failure path.
+      2. Create the Supabase Auth user (admin API, bypasses email
+         confirmation via email_confirm=True so the homeowner can
+         log in immediately with the password the admin just set —
+         no dependency on Supabase's email sending being configured).
+      3. Insert the homeowners row linked to that new auth user_id.
+      4. If step 3 fails after step 2 succeeded, delete the
+         just-created Auth user so we don't leave an orphaned login
+         with no homeowner profile attached.
+    """
+    email = data["email"]
+    if get_homeowner_by_email_admin(email) is not None:
+        raise DuplicateHomeownerError(
+            f"A homeowner account with the email {email} already exists."
+        )
+
+    client = get_supabase_admin_client()
+
+    try:
+        auth_result = client.auth.admin.create_user(
+            {
+                "email": email,
+                "password": password,
+                "email_confirm": True,
+            }
+        )
+    except Exception as e:
+        raise AccountCreationError(f"Could not create the login account: {e}")
+
+    new_user_id = auth_result.user.id
+
+    try:
+        return create_homeowner_admin({**data, "user_id": new_user_id})
+    except Exception:
+        # Roll back the orphaned Auth user so a failed profile insert
+        # doesn't leave a login with no homeowner record behind it.
+        client.auth.admin.delete_user(new_user_id)
+        raise
 
 
 def update_homeowner_admin(homeowner_id: str, data: dict) -> Optional[Homeowner]:

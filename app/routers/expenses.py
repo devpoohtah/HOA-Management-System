@@ -10,6 +10,7 @@ from app.services.expense_service import (
     get_expense_totals_by_category,
     create_expense_admin,
 )
+from app.services.project_service import list_all_projects
 from app.schemas.expense import ExpenseCreate
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
@@ -45,10 +46,11 @@ def expenses_list_public(request: Request, user=Depends(require_authenticated)):
 
 @router.get("/record")
 def record_expense_form(request: Request, user=Depends(require_role("admin"))):
+    projects = list_all_projects()
     return templates.TemplateResponse(
         request=request,
         name="expenses/record.html",
-        context={"error": None},
+        context={"projects": projects, "error": None},
     )
 
 
@@ -61,6 +63,7 @@ def record_expense_submit(
     expense_date: str = Form(...),
     vendor: Optional[str] = Form(None),
     receipt_url: Optional[str] = Form(None),
+    project_id: Optional[str] = Form(None),
     user=Depends(require_role("admin")),
 ):
     expense_data = ExpenseCreate(
@@ -70,9 +73,10 @@ def record_expense_submit(
         expense_date=expense_date,
         vendor=vendor,
         receipt_url=receipt_url,
+        project_id=project_id or None,
     ).model_dump()
 
     recorded_by = getattr(user, "id", "unknown")
     create_expense_admin(expense_data, recorded_by=recorded_by)
 
-    return RedirectResponse(url="/expenses", status_code=303)
+    return RedirectResponse(url="/expenses", status_code=303)   

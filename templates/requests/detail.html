@@ -17,6 +17,10 @@
             <span class="text-xs text-gray-400">{{ req.created_at or "" }}</span>
         </div>
 
+        {% if is_admin_view %}
+        <p class="text-sm text-gray-500 mb-3">Requested by: <span class="text-gray-700 font-medium">{{ requester_name }}</span></p>
+        {% endif %}
+
         <p class="text-sm text-gray-700 whitespace-pre-line mb-6">{{ req.description }}</p>
 
         <div class="flex items-center gap-3 mb-2">
