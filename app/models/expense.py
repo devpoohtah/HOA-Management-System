@@ -24,5 +24,5 @@ class Expense:
     vendor: Optional[str] = None
     receipt_url: Optional[str] = None
     recorded_by: Optional[str] = None
-    created_at: Optional[str] = None
     project_id: Optional[str] = None
+    created_at: Optional[str] = None

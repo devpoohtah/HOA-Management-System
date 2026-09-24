@@ -14,11 +14,17 @@ from app.services.payment_service import (
     record_payment_admin,
 )
 from app.services.homeowner_service import list_all_homeowners_admin, get_own_homeowner_profile
-from app.services.dues_service import list_all_assessments_admin
+from app.services.dues_service import list_all_assessments_admin, list_own_assessments
 from app.schemas.payment import PaymentCreate
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
+def _assessment_labels(assessments):
+    """Map assessment id -> 'Description — Period' so payment lists can show what each payment covers."""
+    return {
+        a.id: (f"{a.description} — {a.period_label}" if a.period_label else a.description)
+        for a in assessments
+    }
 
 @router.get("")
 def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
@@ -27,6 +33,7 @@ def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
     homeowner_names = {h.id: h.full_name for h in homeowners}
     # recorded_by stores the Supabase Auth user id of whoever recorded the payment
     recorder_names = {h.user_id: h.full_name for h in homeowners}
+    assessment_labels = _assessment_labels(list_all_assessments_admin())
     return templates.TemplateResponse(
         request=request,
         name="payments/list.html",
@@ -34,6 +41,7 @@ def payments_list_admin(request: Request, user=Depends(require_role("admin"))):
             "payments": payments,
             "homeowner_names": homeowner_names,
             "recorder_names": recorder_names,
+            "assessment_labels": assessment_labels,
         },
     )
 
@@ -109,8 +117,11 @@ def my_payment_history(request: Request, user=Depends(require_authenticated)):
         )
 
     payments = list_own_payments(access_token=access_token, homeowner_id=homeowner.id)
+    assessment_labels = _assessment_labels(
+        list_own_assessments(access_token=access_token, homeowner_id=homeowner.id)
+    )
     return templates.TemplateResponse(
         request=request,
         name="payments/history.html",
-        context={"homeowner": homeowner, "payments": payments},
+        context={"homeowner": homeowner, "payments": payments, "assessment_labels": assessment_labels},
     )

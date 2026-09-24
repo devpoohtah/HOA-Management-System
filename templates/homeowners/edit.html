@@ -1,6 +1,6 @@
 {% extends "admin_base.html" %}
 
-{% block title %}Manage Role - HOA Management System{% endblock %}
+{% block title %}Manage Homeowner - HOA Management System{% endblock %}
 
 {% block content %}
 <div class="max-w-lg mx-auto">
@@ -9,14 +9,67 @@
         Back to Homeowners
     </a>
 
-    <h1 class="text-2xl font-semibold text-gray-900 mb-1">Manage Role</h1>
+    <h1 class="text-2xl font-semibold text-gray-900 mb-1">Manage Homeowner</h1>
     <p class="text-sm text-gray-500 mb-6">{{ homeowner.full_name }} — {{ homeowner.email }}</p>
+
+    {% if details_error %}
+    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{{ details_error }}</div>
+    {% endif %}
+
+    <form method="post" action="/homeowners/{{ homeowner.id }}/details" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900">Details</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input type="text" id="first_name" name="first_name" required value="{{ homeowner.first_name }}"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input type="text" id="last_name" name="last_name" required value="{{ homeowner.last_name }}"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="block" class="block text-sm font-medium text-gray-700 mb-1">Block</label>
+                <input type="text" id="block" name="block" value="{{ homeowner.block or '' }}"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div>
+                <label for="lot" class="block text-sm font-medium text-gray-700 mb-1">Lot</label>
+                <input type="text" id="lot" name="lot" value="{{ homeowner.lot or '' }}"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+        </div>
+
+        <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input type="text" id="phone" name="phone" value="{{ homeowner.phone or '' }}"
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email (login)</label>
+            <input type="text" id="email" value="{{ homeowner.email }}" disabled
+                   class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500" />
+            <p class="text-xs text-gray-400 mt-1">The email is the homeowner's login, so it can't be changed here.</p>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            Save Details
+        </button>
+    </form>
 
     {% if error %}
     <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">{{ error }}</div>
     {% endif %}
 
     <form method="post" action="/homeowners/{{ homeowner.id }}/role" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <h2 class="text-sm font-semibold text-gray-900">Role</h2>
         <div>
             <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select id="role" name="role" required

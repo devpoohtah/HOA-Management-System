@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from fastapi.responses import RedirectResponse
+from typing import Optional
 
 from app.core.templates import templates
 from app.core.dependencies import require_authenticated, require_role
@@ -10,13 +11,14 @@ from app.services.homeowner_service import (
     list_all_homeowners_admin,
     get_own_homeowner_profile,
     get_homeowner_by_id_admin,
+    update_homeowner_admin,
     update_homeowner_role_admin,
     create_homeowner_account_admin,
     RoleChangeNotAllowedError,
     DuplicateHomeownerError,
     AccountCreationError,
 )
-from app.schemas.homeowner import HomeownerRoleUpdate, HomeownerAccountCreate
+from app.schemas.homeowner import HomeownerRoleUpdate, HomeownerAccountCreate, HomeownerUpdate
 
 router = APIRouter(prefix="/homeowners", tags=["homeowners"])
 
@@ -39,8 +41,9 @@ def homeowners_list(request: Request, user=Depends(require_role("admin"))):
 @router.get("/new")
 def new_homeowner_form(request: Request, user=Depends(require_role("admin"))):
     return templates.TemplateResponse(
-        "homeowners/new.html",
-        {"request": request, "error": None, "form": {}},
+        request=request,
+        name="homeowners/new.html",
+        context={"error": None, "form": {}},
     )
 
 
@@ -64,21 +67,24 @@ def create_homeowner_submit(
         payload = HomeownerAccountCreate(**form_values, password=password)
     except Exception as e:
         return templates.TemplateResponse(
-            "homeowners/new.html",
-            {"request": request, "error": str(e), "form": form_values},
+            request=request,
+            name="homeowners/new.html",
+            context={"error": str(e), "form": form_values},
         )
 
     try:
         create_homeowner_account_admin(payload.model_dump(exclude={"password"}), payload.password)
     except DuplicateHomeownerError as e:
         return templates.TemplateResponse(
-            "homeowners/new.html",
-            {"request": request, "error": str(e), "form": form_values},
+            request=request,
+            name="homeowners/new.html",
+            context={"error": str(e), "form": form_values},
         )
     except AccountCreationError as e:
         return templates.TemplateResponse(
-            "homeowners/new.html",
-            {"request": request, "error": str(e), "form": form_values},
+            request=request,
+            name="homeowners/new.html",
+            context={"error": str(e), "form": form_values},
         )
 
     return RedirectResponse(url="/homeowners", status_code=303)
@@ -138,3 +144,44 @@ def update_role_submit(
         )
 
     return RedirectResponse(url="/homeowners", status_code=303)
+
+@router.post("/{homeowner_id}/details")
+def update_details_submit(
+    request: Request,
+    homeowner_id: str,
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    phone: Optional[str] = Form(None),
+    block: Optional[str] = Form(None),
+    lot: Optional[str] = Form(None),
+    user=Depends(require_role("admin")),
+):
+    """Admin-only: edit a homeowner's name, phone, block, and lot. Email is not editable here."""
+    homeowner = get_homeowner_by_id_admin(homeowner_id)
+    if homeowner is None:
+        raise HTTPException(status_code=404, detail="Homeowner not found.")
+
+    first_name = first_name.strip()
+    last_name = last_name.strip()
+    if not first_name or not last_name:
+        return templates.TemplateResponse(
+            request=request,
+            name="homeowners/edit.html",
+            context={
+                "homeowner": homeowner,
+                "current_user_id": user.id,
+                "error": None,
+                "details_error": "First name and last name cannot be blank.",
+            },
+            status_code=400,
+        )
+
+    validated = HomeownerUpdate(
+        first_name=first_name,
+        last_name=last_name,
+        phone=(phone or "").strip() or None,
+        block=(block or "").strip() or None,
+        lot=(lot or "").strip() or None,
+    )
+    update_homeowner_admin(homeowner_id, validated.model_dump(exclude_unset=True))
+    return RedirectResponse(url="/homeowners", status_code=303) 
