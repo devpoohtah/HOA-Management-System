@@ -39,7 +39,9 @@
                 {% endif %}
             </div>
             <p class="text-sm text-gray-700 line-clamp-2">{{ c.description }}</p>
-            <p class="text-xs text-gray-400 mt-2">{{ c.created_at or "" }}</p>
+            <p class="text-xs text-gray-400 mt-2">
+                {% if is_admin_view %}Submitted by {{ submitter_labels.get(c.homeowner_id, "Unknown homeowner") }} · {% endif %}{{ c.created_at or "" }}
+            </p>
         </a>
         {% else %}
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center text-gray-400">

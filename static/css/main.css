@@ -1,0 +1,5 @@
+/* Serif face used only for the subdivision name and section headlines —
+   everything else stays on Tailwind's default sans stack. */
+.font-display {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+}

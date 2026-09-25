@@ -13,11 +13,12 @@ from app.services.homeowner_service import (
     get_homeowner_by_id_admin,
     update_homeowner_admin,
     update_homeowner_role_admin,
+    admin_reset_homeowner_password,
     create_homeowner_account_admin,
     RoleChangeNotAllowedError,
     DuplicateHomeownerError,
     AccountCreationError,
-)
+)   
 from app.schemas.homeowner import HomeownerRoleUpdate, HomeownerAccountCreate, HomeownerUpdate
 
 router = APIRouter(prefix="/homeowners", tags=["homeowners"])
@@ -185,3 +186,26 @@ def update_details_submit(
     )
     update_homeowner_admin(homeowner_id, validated.model_dump(exclude_unset=True))
     return RedirectResponse(url="/homeowners", status_code=303) 
+
+@router.post("/{homeowner_id}/reset-password")
+def reset_password_submit(
+    request: Request,
+    homeowner_id: str,
+    user=Depends(require_role("admin")),
+):
+    homeowner = get_homeowner_by_id_admin(homeowner_id)
+    if homeowner is None:
+        raise HTTPException(status_code=404, detail="Homeowner not found.")
+
+    temp_password = admin_reset_homeowner_password(homeowner.user_id)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="homeowners/edit.html",
+        context={
+            "homeowner": homeowner,
+            "current_user_id": user.id,
+            "error": None,
+            "temp_password": temp_password,
+        },
+    )

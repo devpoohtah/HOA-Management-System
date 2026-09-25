@@ -11,6 +11,7 @@ from app.services.expense_service import (
     create_expense_admin,
 )
 from app.services.project_service import list_all_projects
+from app.services.homeowner_service import list_all_homeowners_admin
 from app.schemas.expense import ExpenseCreate
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
@@ -19,11 +20,14 @@ router = APIRouter(prefix="/expenses", tags=["expenses"])
 @router.get("")
 def expenses_list_admin(request: Request, user=Depends(require_role("admin"))):
     expenses = list_all_expenses_admin()
+    # recorded_by stores the Supabase Auth user id of whoever recorded the expense
+    recorder_names = {h.user_id: h.full_name for h in list_all_homeowners_admin()}
     return templates.TemplateResponse(
         request=request,
         name="expenses/list.html",
         context={
             "expenses": expenses,
+            "recorder_names": recorder_names,
             "is_admin_view": True,
             "base_template": "admin_base.html",
         },
@@ -39,7 +43,7 @@ def expenses_list_public(request: Request, user=Depends(require_authenticated)):
         context={
             "expenses": expenses,
             "is_admin_view": False,
-            "base_template": "base.html",
+            "base_template": "homeowner_base.html",
         },
     )
 

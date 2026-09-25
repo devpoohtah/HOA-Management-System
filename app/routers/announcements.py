@@ -26,7 +26,7 @@ def announcements_list(request: Request, user=Depends(require_authenticated)):
         context={
             "announcements": announcements,
             "is_admin": is_admin,
-            "base_template": "admin_base.html" if is_admin else "base.html",
+            "base_template": "admin_base.html" if is_admin else "homeowner_base.html",  
         },
     )
 
@@ -70,7 +70,7 @@ def announcement_detail(request: Request, announcement_id: str, user=Depends(req
         context={
             "announcement": announcement,
             "is_admin": is_admin,
-            "base_template": "admin_base.html" if is_admin else "base.html",
+            "base_template": "admin_base.html" if is_admin else "homeowner_base.html",
         },
     )
 

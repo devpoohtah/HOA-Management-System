@@ -7,14 +7,19 @@
     <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
 
         <div class="text-center mb-8">
-            <div class="mx-auto mb-4 h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center">
-                <i data-lucide="home" class="text-white w-6 h-6"></i>
-            </div>
+            <img src="/static/images/logo.png" alt="Iloilo River Plains Village 3 logo"
+                 class="mx-auto mb-4 h-12 w-12 rounded-xl object-cover" />
             <h1 class="text-xl font-semibold text-gray-900">
                 Iloilo River Plains Subdivision Village 3
             </h1>
             <p class="text-sm text-gray-500 mt-1">HOA Management System</p>
         </div>
+
+        {% if success %}
+        <div class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3">
+            {{ success }}
+        </div>
+        {% endif %}
 
         {% if error %}
         <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">
@@ -57,6 +62,12 @@
             >
                 Log In
             </button>
+
+            <p class="text-center text-sm text-gray-500 pt-1">
+                <a href="/login/forgot-password" class="text-blue-600 hover:text-blue-700 font-medium">
+                    Forgot your password?
+                </a>
+            </p>
         </form>
 
     </div>

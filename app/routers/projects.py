@@ -26,7 +26,8 @@ def projects_list(request: Request, user=Depends(require_authenticated)):
         name="projects/list.html",
         context={
             "projects": projects,
-            "base_template": "admin_base.html" if role == "admin" else "base.html",
+            "is_admin_view": role == "admin",
+            "base_template": "admin_base.html" if role == "admin" else "homeowner_base.html",
         },
     )
 

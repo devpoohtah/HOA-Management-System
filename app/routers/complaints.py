@@ -13,11 +13,24 @@ from app.services.complaint_service import (
     create_complaint,
     update_complaint_status_admin,
 )
-from app.services.homeowner_service import get_own_homeowner_profile
+from app.services.homeowner_service import (
+    get_own_homeowner_profile,
+    get_homeowner_by_id_admin,
+    list_all_homeowners_admin,
+)
 from app.schemas.complaint import ComplaintCreate, ComplaintStatusUpdate
 
 router = APIRouter(prefix="/complaints", tags=["complaints"])
 
+def _submitter_label(homeowner):
+    """'Juan Cruz (Block 3, Lot 7)' — so the admin can tell who submitted a complaint."""
+    place = ", ".join(
+        p for p in (
+            f"Block {homeowner.block}" if homeowner.block else "",
+            f"Lot {homeowner.lot}" if homeowner.lot else "",
+        ) if p
+    )
+    return f"{homeowner.full_name} ({place})" if place else homeowner.full_name
 
 @router.get("")
 def complaints_list(request: Request, user=Depends(require_authenticated)):
@@ -25,11 +38,13 @@ def complaints_list(request: Request, user=Depends(require_authenticated)):
 
     if role_meets_minimum(role, "admin"):
         complaints = list_all_complaints_admin()
+        submitter_labels = {h.id: _submitter_label(h) for h in list_all_homeowners_admin()}
         return templates.TemplateResponse(
             request=request,
             name="complaints/list.html",
             context={
                 "complaints": complaints,
+                "submitter_labels": submitter_labels,
                 "is_admin_view": True,
                 "base_template": "admin_base.html",
             },
@@ -51,7 +66,7 @@ def complaints_list(request: Request, user=Depends(require_authenticated)):
         context={
             "complaints": complaints,
             "is_admin_view": False,
-            "base_template": "base.html",
+            "base_template": "homeowner_base.html",
         },
     )
 
@@ -106,13 +121,19 @@ def complaint_detail(request: Request, complaint_id: str, user=Depends(require_a
     if complaint is None:
         raise HTTPException(status_code=404, detail="Complaint not found.")
 
+    submitter = None
+    if is_admin_view:
+        submitter_homeowner = get_homeowner_by_id_admin(complaint.homeowner_id)
+        submitter = _submitter_label(submitter_homeowner) if submitter_homeowner else "Unknown homeowner"
+
     return templates.TemplateResponse(
         request=request,
         name="complaints/detail.html",
         context={
             "complaint": complaint,
+            "submitter": submitter,
             "is_admin_view": is_admin_view,
-            "base_template": "admin_base.html" if is_admin_view else "base.html",
+            "base_template": "admin_base.html" if is_admin_view else "homeowner_base.html",
         },
     )
 

@@ -36,7 +36,8 @@ def meetings_list(request: Request, user=Depends(require_authenticated)):
         name="meetings/list.html",
         context={
             "meetings": meetings,
-            "base_template": "admin_base.html" if role == "admin" else "base.html",
+            "is_admin_view": role == "admin",
+            "base_template": "admin_base.html" if role == "admin" else "homeowner_base.html",
         },
     )
 
@@ -100,7 +101,7 @@ def meeting_detail(request: Request, meeting_id: str, user=Depends(require_authe
             "homeowners": picker_homeowners,
             "selected_names": selected_names,
             "guest_text": guest_text,
-            "base_template": "admin_base.html" if is_admin_view else "base.html",
+            "base_template": "admin_base.html" if is_admin_view else "homeowner_base.html",
         },
     )
 

@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
+    # --- Password reset ---
+    # Used to build the link Supabase emails back to us. Must exactly
+    # match a URL added to Supabase Dashboard -> Authentication ->
+    # URL Configuration -> Redirect URLs, or the reset link will fail.
+    APP_BASE_URL: str = "http://localhost:8000"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

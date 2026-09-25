@@ -226,3 +226,28 @@ def update_homeowner_role_admin(homeowner_id: str, new_role: str, acting_user_id
     if not response.data:
         return None
     return _row_to_homeowner(response.data[0])
+
+def _generate_temp_password() -> str:
+    """
+    A short, readable temporary password an admin can read aloud or
+    write down for a homeowner — avoids visually ambiguous characters
+    (0/O, 1/l/I) since it's meant to be handed over in person, not
+    copy-pasted from a screen.
+    """
+    import secrets
+    alphabet = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
+    return "".join(secrets.choice(alphabet) for _ in range(10))
+
+
+def admin_reset_homeowner_password(user_id: str) -> str:
+    """
+    Admin-only: force-sets a brand-new random password for a homeowner's
+    login and returns it in plaintext ONCE, so the admin can relay it to
+    the homeowner (in person, by phone, etc). Supabase never returns a
+    user's password after this, so if it's lost, the only recourse is
+    to reset it again.
+    """
+    client = get_supabase_admin_client()
+    new_password = _generate_temp_password()
+    client.auth.admin.update_user_by_id(user_id, {"password": new_password})
+    return new_password

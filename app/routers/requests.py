@@ -52,7 +52,7 @@ def requests_list(request: Request, user=Depends(require_authenticated)):
         context={
             "requests": req_list,
             "is_admin_view": False,
-            "base_template": "base.html",
+              "base_template": "homeowner_base.html",
         },
     )
 

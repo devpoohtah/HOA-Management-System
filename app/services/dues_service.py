@@ -114,7 +114,7 @@ def mark_assessment_paid_admin(assessment_id: str) -> Optional[Assessment]:
         client.table(TABLE_NAME)
         .update({"status": "PAID"})
         .eq("id", assessment_id)
-        .execute()
+        .execute()  
     )
     if not response.data:
         return None

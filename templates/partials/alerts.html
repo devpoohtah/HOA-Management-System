@@ -1,0 +1,28 @@
+{#
+    Shared banner for a page-level success or error message.
+    Pages opt in by passing `error` and/or `success` into their
+    TemplateResponse context — this partial doesn't invent messages
+    on its own, it just gives them one consistent look.
+
+    NOTE: several pages (login, homeowner edit, expense record, etc.)
+    currently render their own inline error box instead of using
+    this. Wiring every one of those to this shared partial is a
+    separate cleanup task, not done as part of this change.
+#}
+{% if error %}
+<div class="border-b border-red-200 bg-red-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-start gap-2.5 text-sm text-red-700">
+        <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+        <p>{{ error }}</p>
+    </div>
+</div>
+{% endif %}
+
+{% if success %}
+<div class="border-b border-green-200 bg-green-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-start gap-2.5 text-sm text-green-700">
+        <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+        <p>{{ success }}</p>
+    </div>
+</div>
+{% endif %}

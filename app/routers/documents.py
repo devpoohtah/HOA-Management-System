@@ -21,7 +21,7 @@ def documents_list(request: Request, user=Depends(require_authenticated)):
         context={
             "documents": documents,
             "is_admin_view": is_admin_view,
-            "base_template": "admin_base.html" if is_admin_view else "base.html",
+            "base_template": "admin_base.html" if is_admin_view else "homeowner_base.html",
         },
     )
 

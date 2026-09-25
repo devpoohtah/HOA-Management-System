@@ -69,7 +69,6 @@
     {% endif %}
 
     <form method="post" action="/homeowners/{{ homeowner.id }}/role" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
-        <h2 class="text-sm font-semibold text-gray-900">Role</h2>
         <div>
             <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select id="role" name="role" required
@@ -92,5 +91,31 @@
             Update Role
         </button>
     </form>
+
+    {% if temp_password %}
+    <div class="mt-6 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+        <p class="text-sm font-medium text-amber-800 mb-1">New temporary password</p>
+        <p class="text-lg font-mono font-semibold text-amber-900">{{ temp_password }}</p>
+        <p class="text-xs text-amber-700 mt-2">
+            Give this to the homeowner directly. It won't be shown again — if it's lost,
+            reset the password again to generate a new one.
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-1">Password</h2>
+        <p class="text-xs text-gray-500 mb-4">
+            Sets a new random password for this homeowner's login. Use this if they've
+            forgotten their password and can't use the email reset link.
+        </p>
+        <form method="post" action="/homeowners/{{ homeowner.id }}/reset-password"
+              onsubmit="return confirm('Reset the password for {{ homeowner.full_name }}? Their current password will stop working immediately.');">
+            <button type="submit"
+                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+                Reset Password
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

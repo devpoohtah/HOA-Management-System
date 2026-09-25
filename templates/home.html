@@ -3,16 +3,31 @@
 {% block title %}Iloilo River Plains Subdivision Village 3 - HOA{% endblock %}
 
 {% block content %}
-<div class="min-h-full flex items-center justify-center py-20">
-    <div class="max-w-xl text-center">
-        <div class="mx-auto mb-6 h-16 w-16 rounded-2xl bg-blue-600 flex items-center justify-center">
-            <i data-lucide="home" class="text-white w-8 h-8"></i>
+<div class="max-w-6xl mx-auto px-4">
+
+    <!-- Site header -->
+    <div class="flex items-center justify-between py-6">
+        <div class="flex items-center gap-2.5">
+            <img src="/static/images/logo.png" alt="Iloilo River Plains Village 3 logo"
+                 class="h-9 w-9 rounded-lg object-cover flex-shrink-0" />
+            <span class="text-sm font-semibold text-gray-900 leading-tight">
+                Iloilo River Plains<br class="sm:hidden" /> Village 3
+            </span>
         </div>
-        <h1 class="text-2xl font-semibold text-gray-900 mb-2">
-            Iloilo River Plains Subdivision Village 3
+        <a href="/login"
+           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+            Log In
+        </a>
+    </div>
+
+    <!-- Hero -->
+    <div class="py-14 sm:py-20 max-w-2xl">
+        <h1 class="font-display text-3xl sm:text-4xl font-semibold text-gray-900 leading-tight mb-4">
+            One place for dues, projects, and everything in between.
         </h1>
-        <p class="text-sm text-gray-500 mb-8">
-            HOA Management System — dues, payments, announcements, and more, in one place.
+        <p class="text-base text-gray-600 mb-8 max-w-lg">
+            The official record for Iloilo River Plains Subdivision Village 3. Check your dues,
+            follow ongoing projects, and stay up to date with the association.
         </p>
         <a href="/login"
            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-6 py-3 transition-colors">
@@ -20,5 +35,84 @@
             Log In
         </a>
     </div>
+
+    <!-- Transparency teaser -->
+    <div class="border-y border-gray-200 py-10 sm:py-12">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+            <div class="h-11 w-11 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="pie-chart" class="text-blue-600 w-5 h-5"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-semibold text-gray-900 mb-1">
+                    Full financial transparency for every resident
+                </h2>
+                <p class="text-sm text-gray-500 max-w-xl">
+                    Collections, expenses, and project spending are visible to every homeowner.
+                    Log in to see where the association stands.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active projects -->
+    {% if active_projects %}
+    <div class="py-10 sm:py-12">
+        <h2 class="font-display text-xl font-semibold text-gray-900 mb-5">Ongoing Projects</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {% for p in active_projects %}
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                {% if p.status == "In Progress" %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mb-3">{{ p.status }}</span>
+                {% elif p.status == "On Hold" %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 mb-3">{{ p.status }}</span>
+                {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 mb-3">{{ p.status }}</span>
+                {% endif %}
+                <h3 class="text-sm font-semibold text-gray-900 mb-1">{{ p.name }}</h3>
+                <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ p.description }}</p>
+                <p class="text-xs text-gray-400">
+                    ₱{{ "{:,.0f}".format(p.actual_spending) }} of ₱{{ "{:,.0f}".format(p.budget) }} budget
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent announcements -->
+    {% if recent_announcements %}
+    <div class="py-10 sm:py-12 border-t border-gray-200">
+        <h2 class="font-display text-xl font-semibold text-gray-900 mb-5">Announcements</h2>
+        <div class="space-y-3">
+            {% for a in recent_announcements %}
+            <div class="flex items-start justify-between gap-4 py-3 border-b border-gray-100 last:border-0">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">{{ a.title }}</p>
+                    <p class="text-sm text-gray-500 line-clamp-1">{{ a.content }}</p>
+                </div>
+                <span class="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">{{ a.created_at or "" }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Closing CTA -->
+    <div class="py-14 sm:py-16 text-center border-t border-gray-200">
+        <h2 class="font-display text-xl font-semibold text-gray-900 mb-4">Ready to check your dues?</h2>
+        <a href="/login"
+           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-6 py-3 transition-colors">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            Log In
+        </a>
+    </div>
+
 </div>
+
+<footer class="border-t border-gray-200 bg-white">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
+        <p>Iloilo River Plains Subdivision Village 3 &middot; Homeowners Association</p>
+        <p>For urgent concerns, contact the HOA secretary directly.</p>
+    </div>
+</footer>
 {% endblock %}
