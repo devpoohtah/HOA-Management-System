@@ -9,7 +9,6 @@ from app.core.dependencies import require_authenticated, require_role
 from app.core.security import get_access_token_from_request
 from app.services.dues_service import (
     list_all_assessments_admin,
-    list_assessments_by_status_admin,
     list_own_assessments,
     create_assessment_admin,
     bulk_generate_assessments_admin,
@@ -20,6 +19,7 @@ from app.schemas.assessment import AssessmentCreate, AssessmentBase
 router = APIRouter(prefix="/dues", tags=["dues"])
 
 
+# route — always load everything; status_filter only pre-selects a tab, doesn't query differently
 @router.get("")
 def dues_list_admin(
     request: Request,
@@ -27,15 +27,14 @@ def dues_list_admin(
     user=Depends(require_role("admin")),
 ):
     """
-    Admin-only: assessments across all homeowners. Pass
-    ?status_filter=UNPAID or ?status_filter=PAID to narrow the list
-    (e.g. delinquent-only view). Any other/missing value shows all.
+    Admin-only: assessments across all homeowners. Status and name
+    filtering both happen client-side now — the whole list loads
+    here and the All/Unpaid/Paid tabs and search box filter it
+    instantly with JS, no page reload. status_filter in the URL (if
+    present, e.g. from an old bookmarked link) only sets which tab
+    starts active — it no longer changes what's queried.
     """
-    if status_filter in ("UNPAID", "PAID"):
-        assessments = list_assessments_by_status_admin(status_filter)
-    else:
-        assessments = list_all_assessments_admin()
-
+    assessments = list_all_assessments_admin()
     homeowner_names = {h.id: h.full_name for h in list_all_homeowners_admin()}
 
     return templates.TemplateResponse(
@@ -43,7 +42,7 @@ def dues_list_admin(
         name="dues/list.html",
         context={
             "assessments": assessments,
-            "status_filter": status_filter,
+            "status_filter": status_filter if status_filter in ("UNPAID", "PAID") else None,
             "homeowner_names": homeowner_names,
         },
     )

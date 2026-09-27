@@ -22,7 +22,7 @@
             </div>
             {% if last_payment %}
             <p class="text-2xl font-semibold text-gray-900">₱{{ "%.2f"|format(last_payment.amount) }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ last_payment.payment_date }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ last_payment.payment_date|format_datetime }}</p>
             {% else %}
             <p class="text-2xl font-semibold text-gray-900">-</p>
             {% endif %}

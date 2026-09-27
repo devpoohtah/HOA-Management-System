@@ -24,24 +24,6 @@ def list_all_assessments_admin() -> List[Assessment]:
     return [_row_to_assessment(row) for row in response.data]
 
 
-def list_assessments_by_status_admin(status: str) -> List[Assessment]:
-    """
-    Admin-only: assessments filtered by status ("UNPAID" or "PAID").
-    Used for the delinquent/unpaid-only view on /dues. Filtering
-    happens at the database (.eq), not by pulling every row and
-    discarding most of them in Python.
-    """
-    client = get_supabase_admin_client()
-    response = (
-        client.table(TABLE_NAME)
-        .select("*")
-        .eq("status", status)
-        .order("due_date")
-        .execute()
-    )
-    return [_row_to_assessment(row) for row in response.data]
-
-
 def list_assessments_for_homeowner_admin(homeowner_id: str) -> List[Assessment]:
     """Admin-only: assessments for one specific homeowner."""
     client = get_supabase_admin_client()

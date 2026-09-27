@@ -54,6 +54,24 @@
         </div>
     </div>
 
+    <!-- HOA Officers -->
+    {% if officers %}
+    <div class="py-10 sm:py-12 border-t border-gray-200">
+        <h2 class="font-display text-xl font-semibold text-gray-900 mb-5">HOA Officers</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {% for o in officers %}
+            <div class="text-center">
+                <div class="mx-auto mb-3 h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i data-lucide="user" class="text-gray-400 w-7 h-7"></i>
+                </div>
+                <p class="text-sm font-semibold text-gray-900">{{ o.first_name }} {{ o.last_name }}</p>
+                <p class="text-xs text-gray-500">{{ o.position }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Active projects -->
     {% if active_projects %}
     <div class="py-10 sm:py-12">
@@ -90,7 +108,7 @@
                     <p class="text-sm font-medium text-gray-900">{{ a.title }}</p>
                     <p class="text-sm text-gray-500 line-clamp-1">{{ a.content }}</p>
                 </div>
-                <span class="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">{{ a.created_at or "" }}</span>
+                <span class="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">{{ a.created_at|format_datetime or "" }}</span>
             </div>
             {% endfor %}
         </div>
@@ -112,7 +130,7 @@
 <footer class="border-t border-gray-200 bg-white">
     <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
         <p>Iloilo River Plains Subdivision Village 3 &middot; Homeowners Association</p>
-        <p>For urgent concerns, contact the HOA secretary directly.</p>
+        
     </div>
 </footer>
 {% endblock %}

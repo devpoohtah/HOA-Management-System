@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="max-w-lg mx-auto">
-    <a href="/homeowners" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4">
+    <a href="/homeowners" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg px-2 py-1 -ml-2 mb-4 transition-colors">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
         Back to Homeowners
     </a>
@@ -52,6 +52,14 @@
         </div>
 
         <div>
+            <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+            <input type="text" id="position" name="position" value="{{ homeowner.position or '' }}"
+                placeholder="e.g. President, Treasurer, Secretary"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            <p class="text-xs text-gray-400 mt-1">Optional. Shown on the public landing page for admins with a position set. Doesn't affect their permissions in the system.</p>
+        </div>
+
+        <div>
             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email (login)</label>
             <input type="text" id="email" value="{{ homeowner.email }}" disabled
                    class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500" />
@@ -74,7 +82,7 @@
             <select id="role" name="role" required
                     class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="homeowner" {% if homeowner.role == "homeowner" %}selected{% endif %}>Homeowner</option>
-                <option value="admin" {% if homeowner.role == "admin" %}selected{% endif %}>Admin / Secretary</option>
+                <option value="admin" {% if homeowner.role == "admin" %}selected{% endif %}>Admin</option>
             </select>
             <p class="text-xs text-gray-400 mt-1">
                 {% if homeowner.role == "admin" and homeowner.user_id != current_user_id %}
@@ -97,7 +105,7 @@
         <p class="text-sm font-medium text-amber-800 mb-1">New temporary password</p>
         <p class="text-lg font-mono font-semibold text-amber-900">{{ temp_password }}</p>
         <p class="text-xs text-amber-700 mt-2">
-            Give this to the homeowner directly. It won't be shown again — if it's lost,
+            Give this to the homeowner directly. It won't be shown again. if it's lost,
             reset the password again to generate a new one.
         </p>
     </div>
@@ -110,7 +118,8 @@
             forgotten their password and can't use the email reset link.
         </p>
         <form method="post" action="/homeowners/{{ homeowner.id }}/reset-password"
-              onsubmit="return confirm('Reset the password for {{ homeowner.full_name }}? Their current password will stop working immediately.');">
+      data-confirm="Reset the password for {{ homeowner.full_name }}? Their current password will stop working immediately."
+      data-confirm-style="danger">
             <button type="submit"
                     class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
                 Reset Password

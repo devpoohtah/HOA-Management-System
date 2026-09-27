@@ -26,7 +26,7 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 capitalize">
                     {{ a.category }}
                 </span>
-                <span class="text-xs text-gray-400">{{ a.created_at or "" }}</span>
+                <span class="text-xs text-gray-400">{{ a.created_at|format_datetime or "" }}</span>
             </div>
             <h2 class="text-base font-semibold text-gray-900">{{ a.title }}</h2>
             <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ a.content }}</p>

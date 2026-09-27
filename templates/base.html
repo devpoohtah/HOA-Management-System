@@ -39,12 +39,86 @@
         </div>
     </div>
 
+        <!-- Shared confirmation modal — replaces the browser's native
+         confirm() popup, so destructive/consequential actions match the
+         app's own design instead of a generic OS dialog. -->
+    <div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center px-4">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm max-w-sm w-full p-6">
+            <h2 id="confirm-modal-title" class="text-base font-semibold text-gray-900 mb-2">Please confirm</h2>
+            <p id="confirm-modal-message" class="text-sm text-gray-600 mb-6"></p>
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="confirm-modal-cancel"
+                        class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+                    Cancel
+                </button>
+                <button type="button" id="confirm-modal-confirm"
+                        class="inline-flex items-center gap-2 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- App JS -->
     <script src="/static/js/main.js"></script>
 
     <script>
         // Initialize Lucide icons on every page
         lucide.createIcons();
+    </script>
+
+    <script>
+        // Powers every form with data-confirm="..." — shows the styled
+        // modal above instead of the browser's native confirm().
+        // Usage: <form data-confirm="Delete this?" data-confirm-style="danger" ...>
+        (function () {
+            var backdrop = document.getElementById('confirm-modal-backdrop');
+            var titleEl = document.getElementById('confirm-modal-title');
+            var messageEl = document.getElementById('confirm-modal-message');
+            var cancelBtn = document.getElementById('confirm-modal-cancel');
+            var confirmBtn = document.getElementById('confirm-modal-confirm');
+            var pendingForm = null;
+
+            function openModal(form) {
+                pendingForm = form;
+                messageEl.textContent = form.getAttribute('data-confirm') || 'Are you sure?';
+                titleEl.textContent = form.getAttribute('data-confirm-title') || 'Please confirm';
+
+                var isDanger = form.getAttribute('data-confirm-style') === 'danger';
+                confirmBtn.className = 'inline-flex items-center gap-2 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors ' +
+                    (isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700');
+
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('flex');
+            }
+
+            function closeModal() {
+                backdrop.classList.add('hidden');
+                backdrop.classList.remove('flex');
+                pendingForm = null;
+            }
+
+            // Capture phase so this runs before any other submit handlers.
+            document.addEventListener('submit', function (e) {
+                var form = e.target;
+                if (form.hasAttribute && form.hasAttribute('data-confirm') && !form.dataset.confirmed) {
+                    e.preventDefault();
+                    openModal(form);
+                }
+            }, true);
+
+            cancelBtn.addEventListener('click', closeModal);
+            backdrop.addEventListener('click', function (e) {
+                if (e.target === backdrop) closeModal();
+            });
+            confirmBtn.addEventListener('click', function () {
+                if (pendingForm) {
+                    pendingForm.dataset.confirmed = 'true';
+                    pendingForm.submit();
+                }
+                closeModal();
+            });
+        })();
     </script>
 
     {% block scripts %}{% endblock %}

@@ -155,6 +155,7 @@ def update_details_submit(
     phone: Optional[str] = Form(None),
     block: Optional[str] = Form(None),
     lot: Optional[str] = Form(None),
+    position: Optional[str] = Form(None),
     user=Depends(require_role("admin")),
 ):
     """Admin-only: edit a homeowner's name, phone, block, and lot. Email is not editable here."""
@@ -183,6 +184,7 @@ def update_details_submit(
         phone=(phone or "").strip() or None,
         block=(block or "").strip() or None,
         lot=(lot or "").strip() or None,
+        position=(position or "").strip() or None,
     )
     update_homeowner_admin(homeowner_id, validated.model_dump(exclude_unset=True))
     return RedirectResponse(url="/homeowners", status_code=303) 

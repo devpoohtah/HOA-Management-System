@@ -33,7 +33,7 @@
                     <td class="px-6 py-3 text-gray-900">{{ e.description }}</td>
                     <td class="px-6 py-3 text-gray-700">{{ e.vendor or "-" }}</td>
                     <td class="px-6 py-3 text-gray-900 font-medium">₱{{ "%.2f"|format(e.amount) }}</td>
-                    <td class="px-6 py-3 text-gray-700">{{ e.expense_date }}</td>
+                    <td class="px-6 py-3 text-gray-700">{{ e.expense_date|format_datetime }}</td>
                     {% if is_admin_view %}<td class="px-6 py-3 text-gray-700">{{ recorder_names.get(e.recorded_by, "-") if is_admin_view and e.recorded_by else "-" }}</td>{% endif %}
                 </tr>
                 {% else %}

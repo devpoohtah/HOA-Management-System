@@ -31,6 +31,7 @@ class Homeowner:
     block: Optional[str] = None
     lot: Optional[str] = None
     role: str = "homeowner"  # "homeowner" | "admin"
+    position: Optional[str] = None  # e.g. "President", "Treasurer" — display title only, no permission effect
     is_active: bool = True
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

@@ -35,7 +35,7 @@
                     <td class="px-6 py-3 text-gray-700">{{ homeowner_names.get(p.homeowner_id, "Unknown homeowner") }}</td>
                     <td class="px-6 py-3 text-gray-700">{{ assessment_labels.get(p.assessment_id, "-") if p.assessment_id else "General payment" }}</td>
                     <td class="px-6 py-3 text-gray-900 font-medium">₱{{ "%.2f"|format(p.amount) }}</td>
-                    <td class="px-6 py-3 text-gray-700">{{ p.payment_date }}</td>
+                    <td class="px-6 py-3 text-gray-700">{{ p.payment_date|format_datetime }}</td>
                     <td class="px-6 py-3 text-gray-700 capitalize">{{ p.payment_method }}</td>
                     <td class="px-6 py-3 text-gray-700">{{ p.reference_number or "-" }}</td>
                     <td class="px-6 py-3 text-gray-700">{{ recorder_names.get(p.recorded_by, "-") if p.recorded_by else "-" }}</td>

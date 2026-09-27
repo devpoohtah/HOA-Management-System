@@ -45,6 +45,7 @@ class HomeownerUpdate(BaseModel):
     phone: Optional[str] = None
     block: Optional[str] = None
     lot: Optional[str] = None
+    position: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -65,6 +66,7 @@ class HomeownerOut(HomeownerBase):
     """
     id: str
     role: str
+    position: Optional[str] = None
     is_active: bool
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

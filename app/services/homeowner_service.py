@@ -56,6 +56,30 @@ def list_all_homeowners_admin() -> List[Homeowner]:
     return [_row_to_homeowner(row) for row in response.data]
 
 
+def list_officers_public() -> List[dict]:
+    """
+    Public: HOA officers shown on the landing page (no login
+    required). Admins with a position set — e.g. President,
+    Treasurer. Deliberately selects ONLY first_name, last_name, and
+    position — never email, phone, block/lot, or any other
+    homeowner data — since this is visible to anonymous visitors.
+
+    Ordered alphabetically by position: position is free text with
+    no fixed rank yet, so this can't sort "President" before
+    "Treasurer" the way a real hierarchy would. Revisit once the
+    position list is finalized.
+    """
+    client = get_supabase_admin_client()
+    response = (
+        client.table(TABLE_NAME)
+        .select("first_name, last_name, position")
+        .eq("role", "admin")
+        .not_.is_("position", "null")
+        .order("position")
+        .execute()
+    )
+    return response.data
+
 def get_homeowner_by_id_admin(homeowner_id: str) -> Optional[Homeowner]:
     """Admin-only: fetch a single homeowner by record id."""
     client = get_supabase_admin_client()

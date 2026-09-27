@@ -8,6 +8,8 @@ from app.core.security import get_current_user
 from app.services.project_service import list_all_projects, get_project_actual_spending
 from app.services.announcement_service import list_all_announcements
 
+from app.services.homeowner_service import list_officers_public
+
 router = APIRouter(tags=["pages"])
 
 
@@ -33,6 +35,7 @@ def landing_page(request: Request):
         p.actual_spending = get_project_actual_spending(p.id)
 
     recent_announcements = list_all_announcements()[:3]
+    officers = list_officers_public()
 
     return templates.TemplateResponse(
         request=request,
@@ -40,5 +43,6 @@ def landing_page(request: Request):
         context={
             "active_projects": active_projects,
             "recent_announcements": recent_announcements,
+            "officers": officers,
         },
     )

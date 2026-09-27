@@ -42,7 +42,7 @@
             <p class="text-xs text-gray-500 mb-1">{{ homeowners_by_id.get(r.homeowner_id, r.homeowner_id) }}</p>
             {% endif %}
             <p class="text-sm text-gray-700 line-clamp-2">{{ r.description }}</p>
-            <p class="text-xs text-gray-400 mt-2">{{ r.created_at or "" }}</p>
+            <p class="text-xs text-gray-400 mt-2">{{ r.created_at|format_datetime or "" }}</p>
         </a>
         {% else %}
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center text-gray-400">

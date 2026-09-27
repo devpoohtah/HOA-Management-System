@@ -28,7 +28,7 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Upcoming</span>
                 {% endif %}
                 <span class="text-xs text-gray-400">
-                    {{ m.meeting_date }}{% if m.meeting_time %} · {{ m.meeting_time }}{% endif %}
+                    {{ m.meeting_date|format_datetime }}{% if m.meeting_time %} · {{ m.meeting_time }}{% endif %}
                 </span>
             </div>
             <h2 class="text-base font-semibold text-gray-900">{{ m.title }}</h2>
